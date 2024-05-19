@@ -1,0 +1,34 @@
+services:
+  knex-example-database:
+    image: 'postgres'
+    container_name: 'knex-example-database'
+    restart: always
+    shm_size: 128mb
+    volumes:
+      - knex-example-database:/var/lib/postgresql
+      - ./src/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - 'POSTGRES_DB=knex_example'
+      - 'POSTGRES_PASSWORD=postgres'
+    ports:
+      - 5432:5432
+    networks:
+      - knex-example-backend-network
+
+  knex-example-backend:
+    image: knex-example-backend
+    container_name: knex-example-backend
+    build: .
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+    networks:
+      - knex-example-backend-network
+
+networks:
+  knex-example-backend-network:
+    driver: bridge
+
+volumes:
+  knex-example-database:
